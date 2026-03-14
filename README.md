@@ -49,7 +49,7 @@ Set in `backend/.env`:
 
 ## Team Assignments
 
-- **Data Collection**: Labdhi
+- **Data Collection , processing , interpretation **: Labdhi
 - **Web App**: Komal / Shruti / Vaibhav
 - **Voice Assistant / Backend**: Vaibhav / Arnav / Labdhi
 - **DB (MongoDB + Redis)**: Vaibhav / Arnav
