@@ -1,7 +1,8 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const tabs = [
-  { label: '① Landing', path: '/' },
+  
+  { label: '① Landing', path: '/landing' },
   { label: '② Persona Select', path: '/persona' },
   { label: '③ Voice Chat', path: '/chat/mom' },
   { label: '④ Mood Summary', path: '/summary' },
