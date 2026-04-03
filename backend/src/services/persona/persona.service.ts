@@ -74,6 +74,9 @@ export class PersonaService {
    */
   static getVoiceParams(personaId: string) {
     const persona = getPersona(personaId);
-    return persona.voiceParams;
+    return {
+      ...persona.voiceParams,
+      voiceId: persona.voiceId,
+    };
   }
 }

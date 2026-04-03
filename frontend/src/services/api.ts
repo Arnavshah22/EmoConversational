@@ -99,4 +99,19 @@ export const api = {
     });
     return res.json();
   },
+
+  async synthesize(text: string, personaId: string): Promise<ArrayBuffer> {
+    const res = await fetch(`${API_BASE}/chat/synthesize`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ text, personaId }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `TTS failed (${res.status})`);
+    }
+
+    return res.arrayBuffer();
+  },
 };

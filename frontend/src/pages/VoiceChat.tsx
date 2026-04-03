@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { useVoiceStream } from '../hooks/useVoiceStream';
+import { useAudioPlayback } from '../hooks/useAudioPlayback';
 
 const PERSONA_META: Record<string, { emoji: string; color: string; deepColor: string; role: string }> = {
   dad: { emoji: '👨', color: 'var(--sky)', deepColor: 'var(--sky-deep)', role: 'Calm & Steady' },
@@ -54,9 +55,11 @@ export default function VoiceChat() {
   const [textInput, setTextInput] = useState('');
   const [startTime] = useState(Date.now());
   const [moodTrend, setMoodTrend] = useState('Listening...');
+  const [isMuted, setIsMuted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { isRecording, startRecording, stopRecording, getAudioBlob, error: micError } = useVoiceStream();
+  const { isPlaying, isFetching: isTtsFetching, speakText, stopPlayback, unlockAudio } = useAudioPlayback();
   const handleSendRef = useRef<(text: string) => void>(() => {});
 
   const getTime = () => new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
@@ -75,6 +78,11 @@ export default function VoiceChat() {
         if (cancelled) return;
         setSessionId(result.sessionId);
         setMessages([{ role: 'assistant', content: result.greeting, time: getTime() }]);
+
+        // Speak greeting if not muted
+        if (!isMuted) {
+          speakText(result.greeting, personaId).catch(() => {});
+        }
       } catch {
         setMessages([{ role: 'assistant', content: "Hey, I'm here for you. Tell me what's on your mind.", time: getTime() }]);
       }
@@ -86,6 +94,11 @@ export default function VoiceChat() {
   // Send message
   const handleSend = useCallback(async (text: string) => {
     if (!sessionId || !text.trim() || isLoading) return;
+
+    // Unlock audio on user gesture so TTS can play later
+    unlockAudio();
+    // Stop any playing audio when user sends a new message
+    stopPlayback();
 
     setMessages((prev) => [...prev, { role: 'user', content: text, time: getTime() }]);
     setIsLoading(true);
@@ -105,18 +118,28 @@ export default function VoiceChat() {
         assistantReply: result.response,
         emotion: result.emotion?.detected,
       });
+
+      // Auto-speak the response if not muted
+      if (!isMuted) {
+        speakText(result.response, personaId).catch((err) => {
+          console.warn('[Voice] TTS playback failed:', err);
+        });
+      }
     } catch {
       setMessages((prev) => [...prev, { role: 'assistant', content: "I'm sorry, let me try again. I'm here for you.", time: getTime() }]);
     } finally {
       setIsLoading(false);
     }
-  }, [sessionId, isLoading]);
+  }, [sessionId, isLoading, isMuted, personaId, speakText, stopPlayback, unlockAudio]);
 
   // Keep ref in sync for mic toggle
   handleSendRef.current = handleSend;
 
   // Toggle recording
   const handleMicToggle = useCallback(async () => {
+    // Unlock audio context on every mic interaction
+    unlockAudio();
+
     if (isRecording) {
       stopRecording();
       // Wait for MediaRecorder's final ondataavailable to fire
@@ -148,9 +171,20 @@ export default function VoiceChat() {
         setIsTranscribing(false);
       }
     } else {
+      // Stop any playing audio when user starts recording
+      stopPlayback();
       await startRecording();
     }
-  }, [isRecording, stopRecording, getAudioBlob, startRecording]);
+  }, [isRecording, stopRecording, getAudioBlob, startRecording, stopPlayback, unlockAudio]);
+
+  // Replay a specific message
+  const handleReplay = useCallback((text: string) => {
+    if (isPlaying || isTtsFetching) {
+      stopPlayback();
+      return;
+    }
+    speakText(text, personaId).catch(() => {});
+  }, [isPlaying, isTtsFetching, personaId, speakText, stopPlayback]);
 
   const elapsedMin = Math.floor((Date.now() - startTime) / 60000);
 
@@ -187,7 +221,7 @@ export default function VoiceChat() {
             fontSize: '12px', color: '#3D6B3D', background: 'rgba(200,217,200,0.7)',
             padding: '4px 10px', borderRadius: '50px', display: 'inline-block', fontWeight: 500,
           }}>
-            ● {isLoading ? 'Thinking...' : 'Listening'}
+            ● {isPlaying ? 'Speaking' : isLoading ? 'Thinking...' : isTtsFetching ? 'Preparing voice...' : 'Listening'}
           </div>
         </div>
 
@@ -263,6 +297,26 @@ export default function VoiceChat() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
+            {/* Mute/Unmute toggle */}
+            <button
+              onClick={() => {
+                if (isPlaying) stopPlayback();
+                setIsMuted((m) => !m);
+              }}
+              style={{
+                width: '36px', height: '36px', borderRadius: '10px',
+                border: '1.5px solid var(--rose)',
+                background: isMuted ? 'var(--rose)' : 'transparent',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '16px', cursor: 'pointer',
+                color: isMuted ? 'white' : 'var(--text-soft)',
+                transition: 'all 0.2s ease',
+              }}
+              title={isMuted ? 'Unmute voice responses' : 'Mute voice responses'}
+              id="mute-toggle"
+            >
+              {isMuted ? '🔇' : '🔊'}
+            </button>
             <button
               style={{
                 width: '36px', height: '36px', borderRadius: '10px',
@@ -286,6 +340,52 @@ export default function VoiceChat() {
             >✓</button>
           </div>
         </div>
+
+        {/* Speaking indicator bar */}
+        {(isPlaying || isTtsFetching) && (
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+            padding: '8px 0', background: 'linear-gradient(90deg, rgba(200,217,200,0.3), rgba(200,217,200,0.1))',
+            borderBottom: '1px solid rgba(200,217,200,0.3)',
+          }}>
+            {isTtsFetching ? (
+              <>
+                <div style={{
+                  width: '14px', height: '14px', borderRadius: '50%',
+                  border: '2px solid var(--sage-deep)', borderTopColor: 'transparent',
+                  animation: 'spin 0.8s linear infinite',
+                }} />
+                <span style={{ fontSize: '12px', color: 'var(--sage-deep)', fontWeight: 500 }}>
+                  Preparing voice...
+                </span>
+              </>
+            ) : (
+              <>
+                <div style={{ display: 'flex', gap: '2px', alignItems: 'center', height: '16px' }}>
+                  {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} style={{
+                      width: '3px', borderRadius: '3px', background: 'var(--sage-deep)',
+                      animation: `vwave 0.8s ease-in-out ${i * 0.1}s infinite alternate`,
+                    }} />
+                  ))}
+                </div>
+                <span style={{ fontSize: '12px', color: 'var(--sage-deep)', fontWeight: 500 }}>
+                  {meta.emoji} Speaking...
+                </span>
+                <button
+                  onClick={stopPlayback}
+                  style={{
+                    background: 'rgba(61,107,61,0.15)', border: 'none', borderRadius: '6px',
+                    padding: '2px 8px', fontSize: '11px', color: 'var(--sage-deep)',
+                    cursor: 'pointer', fontWeight: 600,
+                  }}
+                >
+                  Stop
+                </button>
+              </>
+            )}
+          </div>
+        )}
 
         {/* Messages */}
         <div style={{
@@ -316,8 +416,28 @@ export default function VoiceChat() {
                   background: msg.role === 'user' ? 'var(--text)' : 'var(--white)',
                   color: msg.role === 'user' ? 'var(--white)' : 'var(--text)',
                   boxShadow: msg.role === 'user' ? 'none' : '0 2px 12px rgba(45,42,38,0.06)',
+                  position: 'relative',
                 }}>
                   {msg.content}
+                  {/* Speaker replay button for assistant messages */}
+                  {msg.role === 'assistant' && (
+                    <button
+                      onClick={() => handleReplay(msg.content)}
+                      title="Replay this message"
+                      style={{
+                        position: 'absolute', bottom: '6px', right: '6px',
+                        width: '24px', height: '24px', borderRadius: '50%',
+                        background: 'rgba(45,42,38,0.06)', border: 'none',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '12px', cursor: 'pointer', transition: 'all 0.2s ease',
+                        opacity: 0.5,
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                      onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.5')}
+                    >
+                      🔊
+                    </button>
+                  )}
                 </div>
                 <div style={{
                   fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px',
@@ -372,6 +492,7 @@ export default function VoiceChat() {
             <button
               onClick={handleMicToggle}
               disabled={isTranscribing || isLoading}
+              id="mic-button"
               style={{
                 width: '64px', height: '64px', borderRadius: '50%',
                 background: isRecording ? '#E84040' : isTranscribing ? '#D4845A' : 'var(--text)',
@@ -403,6 +524,7 @@ export default function VoiceChat() {
               onChange={(e) => setTextInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(textInput); } }}
               disabled={isLoading}
+              id="text-input"
               style={{
                 flex: 1, background: 'transparent', border: 'none', outline: 'none',
                 fontFamily: "'DM Sans', sans-serif", fontSize: '14px', color: 'var(--text)',
@@ -411,6 +533,7 @@ export default function VoiceChat() {
             <button
               onClick={() => handleSend(textInput)}
               disabled={!textInput.trim() || isLoading}
+              id="send-button"
               style={{
                 width: '36px', height: '36px', borderRadius: '50%',
                 background: 'var(--text)', border: 'none', display: 'flex',
@@ -422,6 +545,13 @@ export default function VoiceChat() {
           </div>
         </div>
       </div>
+
+      {/* CSS animations for spin (used by TTS indicator) */}
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

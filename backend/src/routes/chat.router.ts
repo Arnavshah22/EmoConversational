@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { LLMService } from '../services/nvidia/llm.service';
 import { STTService } from '../services/nvidia/stt.service';
+import { TTSService } from '../services/nvidia/tts.service';
 import { EmotionService } from '../services/emotion/emotion.service';
 import { PersonaService } from '../services/persona/persona.service';
 import { KnowledgeService } from '../services/knowledge/knowledge.service';
@@ -9,12 +10,14 @@ import { v4 as uuidv4 } from 'uuid';
 const chatRouter = Router();
 
 // In-memory text chat sessions (for non-WebSocket text mode)
-const textSessions = new Map<string, {
+export type SessionData = {
   personaId: string;
   userName?: string;
   emotionService: EmotionService;
   messageHistory: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>;
-}>();
+};
+
+const textSessions = new Map<string, SessionData>();
 
 /**
  * POST /api/chat/start
@@ -28,11 +31,11 @@ chatRouter.post('/start', async (req: Request, res: Response) => {
     const emotionService = new EmotionService();
     const systemPrompt = PersonaService.buildSystemPrompt(personaId, undefined, userName);
 
-    const session = {
+    const session: SessionData = {
       personaId,
       userName,
       emotionService,
-      messageHistory: [{ role: 'system' as const, content: systemPrompt }],
+      messageHistory: [{ role: 'system', content: systemPrompt }],
     };
 
     textSessions.set(sessionId, session);
@@ -138,7 +141,7 @@ chatRouter.post('/message', async (req: Request, res: Response) => {
  */
 chatRouter.get('/history/:sessionId', async (req: Request, res: Response) => {
   try {
-    const { sessionId } = req.params;
+    const sessionId = req.params.sessionId as string;
     const context = await KnowledgeService.getConversationContext(sessionId, 50);
     res.json({ success: true, messages: context });
   } catch (error: any) {
@@ -176,6 +179,41 @@ chatRouter.post('/transcribe', async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error('[Chat] Transcribe error:', error);
     res.status(500).json({ error: 'Failed to transcribe audio', message: error.message });
+  }
+});
+
+/**
+ * POST /api/chat/synthesize
+ * Convert text to speech audio using persona-specific voice
+ */
+chatRouter.post('/synthesize', async (req: Request, res: Response) => {
+  try {
+    const { text, personaId = 'mom' } = req.body;
+
+    if (!text || typeof text !== 'string') {
+      return res.status(400).json({ error: 'text is required' });
+    }
+
+    // Limit text length to prevent abuse
+    const trimmedText = text.slice(0, 2000);
+
+    console.log(`[TTS] Synthesize request: persona=${personaId}, text="${trimmedText.slice(0, 50)}..."`);
+
+    const voiceParams = PersonaService.getVoiceParams(personaId);
+    const audioBuffer = await TTSService.synthesize(trimmedText, voiceParams);
+
+    console.log(`[TTS] Generated ${audioBuffer.length} bytes of audio`);
+
+    res.set({
+      'Content-Type': 'audio/wav',
+      'Content-Length': audioBuffer.length.toString(),
+      'Cache-Control': 'no-cache',
+    });
+
+    res.send(audioBuffer);
+  } catch (error: any) {
+    console.error('[Chat] Synthesize error:', error?.message || error);
+    res.status(500).json({ error: 'Failed to synthesize speech', message: error?.message });
   }
 });
 

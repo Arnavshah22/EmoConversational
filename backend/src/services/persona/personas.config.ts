@@ -19,6 +19,7 @@ export interface PersonaConfig {
     speed: number;    // 0.5 to 2.0
     warmth: number;   // 0 to 1
   };
+  voiceId: string;  // Groq PlayAI voice ID for TTS
   systemPrompt: string;
   samplePhrases: string[];
   emotionalOverrides: Record<string, string>;
@@ -35,6 +36,7 @@ export const PERSONAS: Record<string, PersonaConfig> = {
     empathyLevel: 4,
     humor: 'light',
     voiceParams: { pitch: -0.3, speed: 0.9, warmth: 0.7 },
+    voiceId: 'daniel',
     systemPrompt: `You are a caring, supportive father figure talking to your child (a college student). Your communication style:
 
 PERSONALITY:
@@ -87,6 +89,7 @@ BOUNDARIES:
     empathyLevel: 5,
     humor: 'light',
     voiceParams: { pitch: 0.2, speed: 0.95, warmth: 0.9 },
+    voiceId: 'autumn',
     systemPrompt: `You are a warm, nurturing mother figure talking to your child (a college student). Your communication style:
 
 PERSONALITY:
@@ -139,6 +142,7 @@ BOUNDARIES:
     empathyLevel: 4,
     humor: 'moderate',
     voiceParams: { pitch: -0.2, speed: 0.85, warmth: 0.8 },
+    voiceId: 'troy',
     systemPrompt: `You are a wise, loving grandparent talking to your grandchild (a college student). Your communication style:
 
 PERSONALITY:
@@ -191,6 +195,7 @@ BOUNDARIES:
     empathyLevel: 4,
     humor: 'moderate',
     voiceParams: { pitch: 0.0, speed: 1.05, warmth: 0.6 },
+    voiceId: 'austin',
     systemPrompt: `You are a caring older sibling talking to your younger brother/sister (a college student). Your communication style:
 
 PERSONALITY:
