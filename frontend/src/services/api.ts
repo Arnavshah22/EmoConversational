@@ -1,5 +1,13 @@
 const API_BASE = '/api';
 
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('ec_token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
+
 export interface Persona {
   id: string;
   name: string;
@@ -28,6 +36,39 @@ export interface ChatMessageResponse {
 }
 
 export const api = {
+  auth: {
+    async register(data: any) {
+      const res = await fetch(`${API_BASE}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return res.json();
+    },
+    async login(data: any) {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return res.json();
+    },
+    async me() {
+      const res = await fetch(`${API_BASE}/auth/me`, {
+        headers: getAuthHeaders(),
+      });
+      return res.json();
+    },
+    async updateProfile(data: any) {
+      const res = await fetch(`${API_BASE}/auth/profile`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data),
+      });
+      return res.json();
+    },
+  },
+
   async getPersonas(): Promise<Persona[]> {
     const res = await fetch(`${API_BASE}/persona/all`);
     const data = await res.json();
@@ -37,7 +78,7 @@ export const api = {
   async startChat(personaId: string, userName?: string): Promise<ChatStartResponse> {
     const res = await fetch(`${API_BASE}/chat/start`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ personaId, userName }),
     });
     return res.json();
@@ -46,14 +87,16 @@ export const api = {
   async sendMessage(sessionId: string, content: string): Promise<ChatMessageResponse> {
     const res = await fetch(`${API_BASE}/chat/message`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ sessionId, content }),
     });
     return res.json();
   },
 
   async getHistory(sessionId: string) {
-    const res = await fetch(`${API_BASE}/chat/history/${sessionId}`);
+    const res = await fetch(`${API_BASE}/chat/history/${sessionId}`, {
+      headers: getAuthHeaders(),
+    });
     return res.json();
   },
 };

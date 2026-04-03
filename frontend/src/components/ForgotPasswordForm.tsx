@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 
-export default function ForgotPasswordForm({ onBack }) {
+interface ForgotPasswordFormProps {
+  onBack: () => void;
+}
+
+export default function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (email) {
       setSent(true);

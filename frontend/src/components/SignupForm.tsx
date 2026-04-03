@@ -37,7 +37,18 @@ export default function SignupForm() {
       formData.password &&
       formData.terms
     ) {
-      navigate("/landing");
+      localStorage.setItem("ec_token", "logged_in");
+      localStorage.setItem(
+        "ec_user_profile",
+        JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          preferredPersona: formData.persona || "mom",
+          mode: "account",
+          joinedAt: new Date().toISOString(),
+        })
+      );
+      navigate("/persona");
     } else {
       alert("Please fill all fields and accept terms");
     }
@@ -168,7 +179,17 @@ export default function SignupForm() {
           const anonId =
             "anon_" + Math.random().toString(36).substring(2, 14);
           sessionStorage.setItem("ec_anon_id", anonId);
-          navigate("/landing");
+          localStorage.setItem(
+            "ec_user_profile",
+            JSON.stringify({
+              name: "Anonymous",
+              email: "",
+              preferredPersona: formData.persona || "mom",
+              mode: "guest",
+              joinedAt: new Date().toISOString(),
+            })
+          );
+          navigate("/persona");
         }}
       >
         🎭 Try anonymously instead

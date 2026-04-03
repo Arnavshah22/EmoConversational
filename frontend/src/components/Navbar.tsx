@@ -1,10 +1,10 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const tabs = [
-  { label: '① Landing', path: '/landing' },
-  { label: '② Persona Select', path: '/persona' },
-  { label: '③ Voice Chat', path: '/chat/mom' },
-  { label: '④ Mood Summary', path: '/summary' },
+  { label: 'Dashboard', path: '/dashboard' },
+  { label: 'Profile', path: '/profile' },
+  { label: 'Chat', path: '/chat/mom' },
+  { label: 'Summary', path: '/summary' },
 ];
 
 export default function Navbar() {
@@ -12,67 +12,58 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const isActive = (path: string) => {
-    if (path === '/') return location.pathname === '/';
-    return location.pathname.startsWith(path.replace('/mom', ''));
+    if (path === '/chat/mom') return location.pathname.startsWith('/chat');
+    return location.pathname.startsWith(path);
+  };
+
+  const profileRaw = localStorage.getItem('ec_user_profile');
+  const profileName = profileRaw ? JSON.parse(profileRaw)?.name : 'User';
+
+  const handleSignOut = () => {
+    localStorage.removeItem('ec_token');
+    localStorage.removeItem('ec_active_user_email');
+    localStorage.removeItem('ec_user_profile');
+    sessionStorage.removeItem('ec_anon_id');
+    navigate('/auth');
   };
 
   return (
-    <nav style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '20px 40px', position: 'sticky', top: 0, zIndex: 100,
-      background: 'rgba(253,248,243,0.85)', backdropFilter: 'blur(16px)',
-      borderBottom: '1px solid rgba(232,196,176,0.3)',
-    }}>
-      <div
-        style={{
-          fontFamily: "'Fraunces', serif", fontSize: '22px', fontWeight: 600,
-          color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '8px',
-          cursor: 'pointer',
-        }}
-        onClick={() => navigate('/landing')}
-      >
-        <span style={{ fontSize: '24px' }}>🧠</span> EmoCompanion
-      </div>
+    <header className="sticky top-0 z-50 border-b border-white/60 bg-cream/80 backdrop-blur-xl">
+      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="flex items-center gap-2 rounded-full border border-white/70 bg-white/70 px-4 py-2 text-sm font-semibold text-ink shadow-sm"
+        >
+          <span className="text-lg">🧠</span>
+          CEA-AI
+        </button>
 
-      <div
-        className="nav-tabs-container"
-        style={{
-          display: 'flex', gap: '4px', background: 'var(--blush)',
-          padding: '5px', borderRadius: '50px',
-        }}
-      >
-        {tabs.map((tab) => {
-          const active = isActive(tab.path);
-          return (
-            <button
-              key={tab.path}
-              onClick={() => navigate(tab.path)}
-              style={{
-                padding: '8px 20px', borderRadius: '50px', border: 'none',
-                background: active ? 'var(--white)' : 'transparent',
-                fontFamily: "'DM Sans', sans-serif", fontSize: '13px', fontWeight: 500,
-                color: active ? 'var(--text)' : 'var(--text-soft)',
-                cursor: 'pointer', transition: 'all 0.25s ease', whiteSpace: 'nowrap',
-                boxShadow: active ? '0 2px 12px rgba(45,42,38,0.1)' : 'none',
-              }}
-              onMouseEnter={(e) => {
-                if (!active) {
-                  e.currentTarget.style.color = 'var(--text)';
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!active) {
-                  e.currentTarget.style.color = 'var(--text-soft)';
-                  e.currentTarget.style.background = 'transparent';
-                }
-              }}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
-    </nav>
+        <div className="hidden items-center gap-2 rounded-full border border-white/60 bg-white/70 p-1 sm:flex">
+          {tabs.map((tab) => {
+            const active = isActive(tab.path);
+            return (
+              <button
+                key={tab.path}
+                onClick={() => navigate(tab.path)}
+                className={`rounded-full px-4 py-2 text-sm transition ${
+                  active ? 'bg-ink text-white' : 'text-muted hover:bg-cream hover:text-ink'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="hidden rounded-full bg-white/70 px-3 py-1 text-xs text-muted sm:inline">
+            {profileName || 'User'}
+          </span>
+          <button onClick={handleSignOut} className="ghost-btn !px-4 !py-2">
+            Sign out
+          </button>
+        </div>
+      </nav>
+    </header>
   );
 }

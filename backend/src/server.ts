@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import { config } from './config';
 import chatRouter from './routes/chat.router';
 import personaRouter from './routes/persona.router';
+import authRouter from './routes/auth.router';
 import { handleVoiceConnection } from './websocket/voiceHandler';
 
 const app = express();
@@ -44,8 +45,10 @@ app.get('/api/health', (_req, res) => {
 });
 
 // ── REST Routes ────────────────────────────────
+app.use('/api/auth', authRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/persona', personaRouter);
+
 
 // ── WebSocket Server ───────────────────────────
 const wss = new WebSocketServer({ server, path: '/ws/voice' });

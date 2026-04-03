@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function LoginForm({ onForgot }) {
+interface LoginFormProps {
+  onForgot: () => void;
+}
+
+export default function LoginForm({ onForgot }: LoginFormProps) {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -11,7 +15,7 @@ export default function LoginForm({ onForgot }) {
 
   const [showPass, setShowPass] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -19,12 +23,21 @@ export default function LoginForm({ onForgot }) {
     }));
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (formData.email && formData.password) {
       localStorage.setItem("ec_token", "logged_in");
-      navigate("/landing");
+      localStorage.setItem(
+        "ec_user_profile",
+        JSON.stringify({
+          name: formData.email.split("@")[0],
+          email: formData.email,
+          mode: "account",
+          joinedAt: new Date().toISOString(),
+        })
+      );
+      navigate("/persona");
     } else {
       alert("Please enter email and password");
     }
@@ -111,7 +124,16 @@ export default function LoginForm({ onForgot }) {
           const anonId =
             "anon_" + Math.random().toString(36).substring(2, 14);
           sessionStorage.setItem("ec_anon_id", anonId);
-          navigate("/landing");
+          localStorage.setItem(
+            "ec_user_profile",
+            JSON.stringify({
+              name: "Anonymous",
+              email: "",
+              mode: "guest",
+              joinedAt: new Date().toISOString(),
+            })
+          );
+          navigate("/persona");
         }}
       >
         🎭 Try anonymously — no login needed

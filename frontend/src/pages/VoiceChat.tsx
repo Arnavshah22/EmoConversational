@@ -17,6 +17,26 @@ interface Message {
   time: string;
 }
 
+const saveHistoryEntry = (entry: {
+  personaId: string;
+  userMessage: string;
+  assistantReply: string;
+  emotion?: string;
+}) => {
+  const storageKey = 'ec_chat_history';
+  const prevRaw = localStorage.getItem(storageKey);
+  const prev = prevRaw ? JSON.parse(prevRaw) : [];
+  const next = [
+    {
+      id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      timestamp: new Date().toISOString(),
+      ...entry,
+    },
+    ...prev,
+  ].slice(0, 40);
+  localStorage.setItem(storageKey, JSON.stringify(next));
+};
+
 export default function VoiceChat() {
   const { personaId = 'mom' } = useParams();
   const [searchParams] = useSearchParams();
@@ -79,6 +99,12 @@ export default function VoiceChat() {
         setMoodTrend(result.emotion.detected === 'joy' ? '↗ Improving' : result.emotion.detected === 'neutral' ? '→ Stable' : '↘ Needs support');
       }
       setMessages((prev) => [...prev, { role: 'assistant', content: result.response, emotion: result.emotion?.detected, time: getTime() }]);
+      saveHistoryEntry({
+        personaId,
+        userMessage: text,
+        assistantReply: result.response,
+        emotion: result.emotion?.detected,
+      });
     } catch {
       setMessages((prev) => [...prev, { role: 'assistant', content: "I'm sorry, let me try again. I'm here for you.", time: getTime() }]);
     } finally {
@@ -199,7 +225,7 @@ export default function VoiceChat() {
 
         {/* Switch persona */}
         <button
-          onClick={() => navigate('/persona')}
+          onClick={() => navigate('/profile')}
           style={{
             background: 'transparent', border: '1.5px solid var(--rose)',
             borderRadius: '12px', padding: '10px', fontFamily: "'DM Sans', sans-serif",

@@ -155,8 +155,8 @@ export default function MoodSummary() {
 
       {/* Actions — matching reference order: ghost left, primary right */}
       <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '28px' }}>
-        <button className="btn-ghost" onClick={() => navigate(-1)}>← Continue session</button>
-        <button className="btn-primary" onClick={() => navigate('/persona')}>New session →</button>
+        <button className="ghost-btn" onClick={() => navigate(-1)}>← Continue session</button>
+        <button className="primary-btn" onClick={() => navigate('/profile')}>New session →</button>
       </div>
     </div>
   );
