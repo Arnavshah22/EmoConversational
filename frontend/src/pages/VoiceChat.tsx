@@ -93,9 +93,14 @@ export default function VoiceChat() {
   const handleMicToggle = useCallback(async () => {
     if (isRecording) {
       stopRecording();
-      await new Promise((r) => setTimeout(r, 300));
+      // Wait for MediaRecorder's final ondataavailable to fire
+      await new Promise((r) => setTimeout(r, 500));
       const audioBlob = getAudioBlob();
-      if (!audioBlob || audioBlob.size < 1000) return;
+      console.log('[Voice] Audio blob:', audioBlob?.size, 'bytes');
+      if (!audioBlob || audioBlob.size < 1000) {
+        console.warn('[Voice] Audio too short or empty, skipping');
+        return;
+      }
 
       setIsTranscribing(true);
       try {
@@ -105,8 +110,11 @@ export default function VoiceChat() {
           body: audioBlob,
         });
         const result = await resp.json();
+        console.log('[Voice] Transcription result:', result);
         if (result.success && result.transcript?.trim()) {
           handleSendRef.current(result.transcript);
+        } else {
+          console.warn('[Voice] No transcript in result:', result);
         }
       } catch (err) {
         console.error('[Voice] Transcription failed:', err);

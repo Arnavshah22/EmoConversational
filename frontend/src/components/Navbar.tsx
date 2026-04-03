@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const tabs = [
-  
   { label: '① Landing', path: '/landing' },
   { label: '② Persona Select', path: '/persona' },
   { label: '③ Voice Chat', path: '/chat/mom' },
@@ -30,31 +29,49 @@ export default function Navbar() {
           color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '8px',
           cursor: 'pointer',
         }}
-        onClick={() => navigate('/')}
+        onClick={() => navigate('/landing')}
       >
         <span style={{ fontSize: '24px' }}>🧠</span> EmoCompanion
       </div>
 
-      <div style={{
-        display: 'flex', gap: '4px', background: 'var(--blush)',
-        padding: '5px', borderRadius: '50px',
-      }}>
-        {tabs.map((tab) => (
-          <button
-            key={tab.path}
-            onClick={() => navigate(tab.path)}
-            style={{
-              padding: '8px 20px', borderRadius: '50px', border: 'none',
-              background: isActive(tab.path) ? 'var(--white)' : 'transparent',
-              fontFamily: "'DM Sans', sans-serif", fontSize: '13px', fontWeight: 500,
-              color: isActive(tab.path) ? 'var(--text)' : 'var(--text-soft)',
-              cursor: 'pointer', transition: 'all 0.25s ease', whiteSpace: 'nowrap',
-              boxShadow: isActive(tab.path) ? '0 2px 12px rgba(45,42,38,0.1)' : 'none',
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div
+        className="nav-tabs-container"
+        style={{
+          display: 'flex', gap: '4px', background: 'var(--blush)',
+          padding: '5px', borderRadius: '50px',
+        }}
+      >
+        {tabs.map((tab) => {
+          const active = isActive(tab.path);
+          return (
+            <button
+              key={tab.path}
+              onClick={() => navigate(tab.path)}
+              style={{
+                padding: '8px 20px', borderRadius: '50px', border: 'none',
+                background: active ? 'var(--white)' : 'transparent',
+                fontFamily: "'DM Sans', sans-serif", fontSize: '13px', fontWeight: 500,
+                color: active ? 'var(--text)' : 'var(--text-soft)',
+                cursor: 'pointer', transition: 'all 0.25s ease', whiteSpace: 'nowrap',
+                boxShadow: active ? '0 2px 12px rgba(45,42,38,0.1)' : 'none',
+              }}
+              onMouseEnter={(e) => {
+                if (!active) {
+                  e.currentTarget.style.color = 'var(--text)';
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!active) {
+                  e.currentTarget.style.color = 'var(--text-soft)';
+                  e.currentTarget.style.background = 'transparent';
+                }
+              }}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
     </nav>
   );

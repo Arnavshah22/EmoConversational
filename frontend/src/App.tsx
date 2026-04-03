@@ -6,10 +6,11 @@ import VoiceChat from './pages/VoiceChat';
 import MoodSummary from './pages/MoodSummary';
 import AuthPage from './pages/AuthPage';
 
-// Protected Route
+// Protected Route — allow logged-in users OR anonymous sessions
 const ProtectedRoute = ({ children }: any) => {
   const token = localStorage.getItem("ec_token");
-  return token ? children : <Navigate to="/auth" />;
+  const anonId = sessionStorage.getItem("ec_anon_id");
+  return token || anonId ? children : <Navigate to="/auth" />;
 };
 
 function AppContent() {

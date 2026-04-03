@@ -78,7 +78,10 @@ p { line-height: 1.7; color: var(--text-soft); }
   align-items: center;
   gap: 8px;
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,42,38,0.2); }
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(45,42,38,0.2);
+}
 
 .btn-ghost {
   background: transparent;
@@ -125,13 +128,66 @@ p { line-height: 1.7; color: var(--text-soft); }
   50% { box-shadow: 0 0 0 14px rgba(232,64,64,0); }
 }
 
+@keyframes selectPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--rose); border-radius: 4px; }
 
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rose) transparent;
+}
+
+/* ── Focus Within for text inputs ── */
+.text-input-focus-within:focus-within {
+  border-color: var(--text) !important;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   h1 { font-size: 36px; }
   h2 { font-size: 32px; }
+
+  /* Landing goes single column */
+  .landing-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .landing-right-panel {
+    display: none !important;
+  }
+
+  /* Chat sidebar collapses */
+  .chat-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .chat-sidebar-panel {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Persona grid goes single column */
+  .persona-grid-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Summary grid goes single column */
+  .summary-grid-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Navbar tabs scroll horizontally */
+  .nav-tabs-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-tabs-container::-webkit-scrollbar { display: none; }
 }

@@ -15,6 +15,7 @@ export function useVoiceStream(
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+  const chunksRef = useRef<Blob[]>([]);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -23,6 +24,7 @@ export function useVoiceStream(
     try {
       setError(null);
       setAudioChunks([]);
+      chunksRef.current = [];
 
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -45,6 +47,7 @@ export function useVoiceStream(
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           chunks.push(event.data);
+          chunksRef.current = [...chunks];
           setAudioChunks([...chunks]);
           onAudioChunk?.(event.data);
         }
@@ -72,9 +75,9 @@ export function useVoiceStream(
   }, []);
 
   const getAudioBlob = useCallback((): Blob | null => {
-    if (audioChunks.length === 0) return null;
-    return new Blob(audioChunks, { type: 'audio/webm' });
-  }, [audioChunks]);
+    if (chunksRef.current.length === 0) return null;
+    return new Blob(chunksRef.current, { type: 'audio/webm' });
+  }, []);
 
   return { isRecording, startRecording, stopRecording, audioChunks, getAudioBlob, error };
 }

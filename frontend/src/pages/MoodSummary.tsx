@@ -7,7 +7,7 @@ export default function MoodSummary() {
     <div style={{ maxWidth: '820px', margin: '0 auto', padding: '52px 40px', animation: 'fadeUp 0.4s ease' }}>
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '44px' }}>
-        <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 400, marginBottom: '8px' }}>
+        <h2 style={{ fontFamily: "'Fraunces', serif", fontWeight: 400, fontSize: '40px', marginBottom: '8px' }}>
           Session recap ✨
         </h2>
         <p style={{ fontSize: '15px', color: 'var(--text-soft)' }}>
@@ -15,7 +15,10 @@ export default function MoodSummary() {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+      <div
+        className="summary-grid-layout"
+        style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}
+      >
         {/* Mood Arc — full width */}
         <div style={{
           background: 'var(--white)', borderRadius: '24px', padding: '28px',
@@ -93,7 +96,7 @@ export default function MoodSummary() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {[
-              { icon: '💛', text: 'You opened up about your feelings — a big first step.' },
+              { icon: '💛', text: 'You opened up about exam anxiety — a big first step.' },
               { icon: '🌱', text: 'Mood shifted from anxious to hopeful by the end.' },
               { icon: '💬', text: 'Messages exchanged during this session.' },
               { icon: '🔒', text: 'Session stored privately. Expires in 30 days.' },
@@ -120,7 +123,7 @@ export default function MoodSummary() {
             textTransform: 'uppercase' as const, color: 'var(--text-muted)',
             marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px',
           }}>
-            👩 A note from your companion
+            👩 A note from Mom
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
             <div style={{
@@ -144,13 +147,13 @@ export default function MoodSummary() {
               fontSize: '60px', color: 'rgba(155,136,196,0.3)', position: 'absolute',
               top: '-10px', left: '16px', fontFamily: "'Fraunces', serif", lineHeight: 1,
             }}>"</span>
-            You're not a failure because of one moment. You're someone who cares deeply — and that's worth so much more.
+            You're not a failure because of one exam. You're someone who cares deeply — and that's worth so much more.
             I'm proud of you for talking today. Come back whenever you need me.
           </div>
         </div>
       </div>
 
-      {/* Actions */}
+      {/* Actions — matching reference order: ghost left, primary right */}
       <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: '28px' }}>
         <button className="btn-ghost" onClick={() => navigate(-1)}>← Continue session</button>
         <button className="btn-primary" onClick={() => navigate('/persona')}>New session →</button>

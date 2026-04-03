@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const PERSONAS = [
   { emoji: "👩", name: "Mom" },
@@ -8,6 +9,7 @@ const PERSONAS = [
 ];
 
 export default function SignupForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,7 +20,7 @@ export default function SignupForm() {
 
   const [showPass, setShowPass] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -26,7 +28,7 @@ export default function SignupForm() {
     }));
   };
 
-  const handleSignup = (e) => {
+  const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (
@@ -35,7 +37,7 @@ export default function SignupForm() {
       formData.password &&
       formData.terms
     ) {
-      alert("Signup successful! (demo)");
+      navigate("/landing");
     } else {
       alert("Please fill all fields and accept terms");
     }
@@ -43,7 +45,7 @@ export default function SignupForm() {
 
   return (
     <form className="auth-form" onSubmit={handleSignup}>
-      
+
       {/* Heading */}
       <h2 className="form-heading">
         Join <em>EmoCompanion</em> 🌱
@@ -115,9 +117,8 @@ export default function SignupForm() {
         {PERSONAS.map(({ emoji, name }) => (
           <div
             key={name}
-            className={`persona-opt ${
-              formData.persona === name ? "picked" : ""
-            }`}
+            className={`persona-opt ${formData.persona === name ? "picked" : ""
+              }`}
             onClick={() =>
               setFormData((prev) => ({ ...prev, persona: name }))
             }
@@ -131,9 +132,8 @@ export default function SignupForm() {
       {/* Terms */}
       <label className="terms-row">
         <div
-          className={`custom-check ${
-            formData.terms ? "checked" : ""
-          }`}
+          className={`custom-check ${formData.terms ? "checked" : ""
+            }`}
           onClick={() =>
             setFormData((prev) => ({
               ...prev,
@@ -168,7 +168,7 @@ export default function SignupForm() {
           const anonId =
             "anon_" + Math.random().toString(36).substring(2, 14);
           sessionStorage.setItem("ec_anon_id", anonId);
-          alert("Anonymous session started");
+          navigate("/landing");
         }}
       >
         🎭 Try anonymously instead

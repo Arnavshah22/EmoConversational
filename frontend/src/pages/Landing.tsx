@@ -4,7 +4,14 @@ export default function Landing() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ minHeight: 'calc(100vh - 65px)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
+    <div
+      className="landing-layout"
+      style={{
+        minHeight: 'calc(100vh - 65px)', display: 'grid',
+        gridTemplateColumns: '1fr 1fr', gap: 0,
+        animation: 'fadeUp 0.4s ease',
+      }}
+    >
       {/* Left side */}
       <div style={{ padding: '80px 60px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '28px' }}>
         <div style={{
@@ -21,7 +28,7 @@ export default function Landing() {
         </h1>
 
         <p style={{ fontSize: '16px', lineHeight: 1.7, color: 'var(--text-soft)', maxWidth: '420px' }}>
-          Talk to a warm, familiar persona like Mom, Dad, or a sibling whenever emotions feel overwhelming. No accounts needed, no stigma.
+          Talk to a warm, familiar persona — like Mom, Dad, or a sibling — whenever emotions feel overwhelming. No accounts needed, no stigma.
         </p>
 
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' as const }}>
@@ -47,11 +54,14 @@ export default function Landing() {
       </div>
 
       {/* Right side — hero card */}
-      <div style={{
-        background: 'linear-gradient(135deg, var(--lavender) 0%, var(--blush) 60%, var(--peach) 100%)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        position: 'relative', overflow: 'hidden', padding: '60px',
-      }}>
+      <div
+        className="landing-right-panel"
+        style={{
+          background: 'linear-gradient(135deg, var(--lavender) 0%, var(--blush) 60%, var(--peach) 100%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          position: 'relative', overflow: 'hidden', padding: '60px',
+        }}
+      >
         {/* Decorative circles */}
         <div style={{
           position: 'absolute', width: '400px', height: '400px',

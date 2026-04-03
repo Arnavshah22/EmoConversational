@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const PERSONAS = [
@@ -37,8 +37,21 @@ export default function PersonaSelect() {
   const [selected, setSelected] = useState<string>('mom');
   const [userName, setUserName] = useState('');
   const [showNameModal, setShowNameModal] = useState(false);
+  const iconRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const selectedPersona = PERSONAS.find((p) => p.id === selected)!;
+
+  const handleSelect = (id: string) => {
+    setSelected(id);
+    // Trigger select-pop animation
+    const el = iconRefs.current[id];
+    if (el) {
+      el.style.animation = 'none';
+      // Force reflow
+      void el.offsetHeight;
+      el.style.animation = 'selectPop 0.2s ease';
+    }
+  };
 
   const handleChat = () => {
     const query = userName ? `?name=${encodeURIComponent(userName)}` : '';
@@ -58,16 +71,19 @@ export default function PersonaSelect() {
       </div>
 
       {/* Persona Grid */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '20px', marginBottom: '40px',
-      }}>
+      <div
+        className="persona-grid-layout"
+        style={{
+          display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '20px', marginBottom: '40px',
+        }}
+      >
         {PERSONAS.map((persona) => {
           const isSelected = selected === persona.id;
           return (
             <div
               key={persona.id}
-              onClick={() => setSelected(persona.id)}
+              onClick={() => handleSelect(persona.id)}
               style={{
                 background: 'var(--white)', borderRadius: '28px', padding: '32px',
                 cursor: 'pointer', position: 'relative', overflow: 'hidden',
@@ -96,11 +112,14 @@ export default function PersonaSelect() {
 
               {/* Top row */}
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <div style={{
-                  width: '68px', height: '68px', borderRadius: '20px',
-                  background: persona.color, display: 'flex', alignItems: 'center',
-                  justifyContent: 'center', fontSize: '34px',
-                }}>
+                <div
+                  ref={(el) => { iconRefs.current[persona.id] = el; }}
+                  style={{
+                    width: '68px', height: '68px', borderRadius: '20px',
+                    background: persona.color, display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', fontSize: '34px',
+                  }}
+                >
                   {persona.emoji}
                 </div>
                 <div style={{
@@ -185,7 +204,10 @@ export default function PersonaSelect() {
                 border: '1.5px solid var(--rose)', background: 'var(--cream)',
                 color: 'var(--text)', fontSize: '15px', outline: 'none',
                 fontFamily: "'DM Sans', sans-serif", marginBottom: '20px',
+                transition: 'border-color 0.2s ease',
               }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--text)'; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--rose)'; }}
             />
 
             <div style={{ display: 'flex', gap: '12px' }}>

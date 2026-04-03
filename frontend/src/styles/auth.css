@@ -182,9 +182,11 @@
   border-radius: 50px;
   border: none;
   background: transparent;
+  font-family: 'DM Sans', sans-serif;
   font-size: 14px;
   font-weight: 500;
   color: var(--text-muted);
+  cursor: pointer;
   transition: all 0.25s ease;
 }
 
@@ -283,6 +285,7 @@
   background: var(--cream);
   border: 1.5px solid var(--rose);
   border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
   font-size: 14px;
   color: var(--text);
   outline: none;
@@ -474,8 +477,10 @@
   border: none;
   padding: 14px;
   border-radius: 50px;
+  font-family: 'DM Sans', sans-serif;
   font-size: 15px;
   font-weight: 500;
+  cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -511,8 +516,10 @@
   color: var(--text-soft);
   padding: 13px;
   border-radius: 50px;
+  font-family: 'DM Sans', sans-serif;
   font-size: 14px;
   font-weight: 500;
+  cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
