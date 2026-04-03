@@ -1,22 +1,53 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Landing from './pages/Landing';
 import PersonaSelect from './pages/PersonaSelect';
 import VoiceChat from './pages/VoiceChat';
 import MoodSummary from './pages/MoodSummary';
+import AuthPage from './pages/AuthPage';
 
-function App() {
+// Protected Route
+const ProtectedRoute = ({ children }: any) => {
+  const token = localStorage.getItem("ec_token");
+  return token ? children : <Navigate to="/auth" />;
+};
+
+function AppContent() {
+  const location = useLocation();
+
   return (
-    <BrowserRouter>
-      <Navbar />
+    <>
+      {/* ✅ Hide Navbar on Auth Page */}
+      {location.pathname !== "/auth" && <Navbar />}
+
       <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/persona" element={<PersonaSelect />} />
-        <Route path="/chat/:personaId" element={<VoiceChat />} />
-        <Route path="/summary" element={<MoodSummary />} />
+        <Route path="/" element={<Navigate to="/auth" />} />
+        <Route path="/auth" element={<AuthPage />} />
+
+        <Route path="/landing" element={
+          <ProtectedRoute><Landing /></ProtectedRoute>
+        } />
+
+        <Route path="/persona" element={
+          <ProtectedRoute><PersonaSelect /></ProtectedRoute>
+        } />
+
+        <Route path="/chat/:personaId" element={
+          <ProtectedRoute><VoiceChat /></ProtectedRoute>
+        } />
+
+        <Route path="/summary" element={
+          <ProtectedRoute><MoodSummary /></ProtectedRoute>
+        } />
       </Routes>
-    </BrowserRouter>
+    </>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
+}
