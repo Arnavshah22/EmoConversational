@@ -26,7 +26,7 @@ personaRouter.get('/all', (_req: Request, res: Response) => {
  * Get a specific persona's info
  */
 personaRouter.get('/:id', (req: Request, res: Response) => {
-  const persona = getPersona(req.params.id);
+  const persona = getPersona(req.params.id as string);
   res.json({
     success: true,
     persona: {
