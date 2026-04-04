@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseWebSocketOptions {
-  url: string;
+  url?: string;
   onMessage?: (data: any) => void;
   onBinaryMessage?: (data: ArrayBuffer) => void;
   onOpen?: () => void;
@@ -10,8 +10,12 @@ interface UseWebSocketOptions {
   autoConnect?: boolean;
 }
 
+const getDefaultWsUrl = () => {
+  return import.meta.env.VITE_WS_URL || `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/voice`;
+};
+
 export function useWebSocket(options: UseWebSocketOptions) {
-  const { url, onMessage, onBinaryMessage, onOpen, onClose, onError, autoConnect = false } = options;
+  const { url = getDefaultWsUrl(), onMessage, onBinaryMessage, onOpen, onClose, onError, autoConnect = false } = options;
   const wsRef = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 

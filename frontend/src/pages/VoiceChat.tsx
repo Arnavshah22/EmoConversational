@@ -153,7 +153,7 @@ export default function VoiceChat() {
 
       setIsTranscribing(true);
       try {
-        const resp = await fetch('/api/chat/transcribe', {
+        const resp = await fetch(`${import.meta.env.VITE_BACKEND_URL || '/api'}/chat/transcribe`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/octet-stream' },
           body: audioBlob,

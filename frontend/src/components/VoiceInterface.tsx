@@ -37,7 +37,7 @@ export default function VoiceInterface({ onTranscript, isLoading, color, status 
     setIsTranscribing(true);
     try {
       console.log(`[Voice] Sending ${audioBlob.size} bytes for transcription...`);
-      const response = await fetch('/api/chat/transcribe', {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || '/api'}/chat/transcribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/octet-stream' },
         body: audioBlob,

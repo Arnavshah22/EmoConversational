@@ -194,7 +194,7 @@ export function useAudioPlayback(): UseAudioPlaybackReturn {
     setError(null);
 
     try {
-      const response = await fetch('/api/chat/synthesize', {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || '/api'}/chat/synthesize`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, personaId }),
