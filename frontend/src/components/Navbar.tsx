@@ -34,7 +34,6 @@ export default function Navbar() {
           onClick={() => navigate('/dashboard')}
           className="flex items-center gap-2 rounded-full border border-white/70 bg-white/70 px-4 py-2 text-sm font-semibold text-ink shadow-sm"
         >
-          <span className="text-lg">🧠</span>
           CEA-AI
         </button>
 
