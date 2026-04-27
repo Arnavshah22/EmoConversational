@@ -69,29 +69,29 @@ const howSteps = [
   },
 ];
 
-const testimonials = [
-  {
-    text: "CEA-AI helped me process difficult emotions when I didn't know where to start. The persona felt genuinely warm.",
-    name: 'Alex M.',
-    role: 'Graduate Student',
-    avatar: '👩‍🎓',
-    bg: '#F0DFD2',
-  },
-  {
-    text: 'I love how private it feels. No judgment, no data-sharing anxiety. Just a calm space to reflect and talk.',
-    name: 'Jamie L.',
-    role: 'Product Designer',
-    avatar: '👨‍💻',
-    bg: '#d4e4cb',
-  },
-  {
-    text: 'The mood insights showed me patterns I never noticed. It became part of my daily self-care routine.',
-    name: 'Priya K.',
-    role: 'Wellness Coach',
-    avatar: '👩‍⚕️',
-    bg: '#C7DBF0',
-  },
-];
+// const testimonials = [
+//   {
+//     text: "CEA-AI helped me process difficult emotions when I didn't know where to start. The persona felt genuinely warm.",
+//     name: 'Alex M.',
+//     role: 'Graduate Student',
+//     avatar: '👩‍🎓',
+//     bg: '#F0DFD2',
+//   },
+//   {
+//     text: 'I love how private it feels. No judgment, no data-sharing anxiety. Just a calm space to reflect and talk.',
+//     name: 'Jamie L.',
+//     role: 'Product Designer',
+//     avatar: '👨‍💻',
+//     bg: '#d4e4cb',
+//   },
+//   {
+//     text: 'The mood insights showed me patterns I never noticed. It became part of my daily self-care routine.',
+//     name: 'Priya K.',
+//     role: 'Wellness Coach',
+//     avatar: '👩‍⚕️',
+//     bg: '#C7DBF0',
+//   },
+// ];
 
 const trustItems = [
   {
@@ -182,7 +182,9 @@ export default function Landing() {
       {/* ── NAVBAR ── */}
       <nav ref={navRef} className="landing-nav" id="landing-nav">
         <div className="nav-brand">
-          <div className="nav-logo">🧠</div>
+          <div className="nav-logo">
+            <img src="public/logo.png" alt="logo" />
+          </div>
           <span className="nav-title">CEA-AI</span>
         </div>
         <div className="nav-links">
@@ -243,7 +245,7 @@ export default function Landing() {
                 See how it works
               </button>
             </div>
-
+{/* 
             <div className="hero-proof">
               <div className="hero-avatars">
                 <div className="hero-avatar hero-avatar-1">😊</div>
@@ -254,7 +256,7 @@ export default function Landing() {
               <p className="hero-proof-text">
                 <strong>10,000+</strong> people already building emotional resilience with CEA-AI
               </p>
-            </div>
+            </div> */}
           </div>
 
           {/* Right — Emotion orbit visual */}
@@ -266,7 +268,7 @@ export default function Landing() {
 
               {/* center */}
               <div className="orbit-center">
-                <span className="orbit-center-icon">🧠</span>
+                <span className="orbit-center-icon">🙍‍♂️</span>
               </div>
 
               {/* orbiting emojis */}
@@ -295,7 +297,7 @@ export default function Landing() {
       </section>
 
       {/* ── STATS ── */}
-      <section className="section" style={{ paddingTop: 0, paddingBottom: 0 }}>
+      {/* <section className="section" style={{ paddingTop: 0, paddingBottom: 0 }}>
         <div className="section-inner">
           <div className="stats-strip reveal">
             {stats.map((s) => (
@@ -309,7 +311,7 @@ export default function Landing() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ── FEATURES ── */}
       <section className="section features-section" id="features">
@@ -479,7 +481,7 @@ export default function Landing() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="section testimonials-section" id="testimonials">
+      {/* <section className="section testimonials-section" id="testimonials">
         <div className="section-inner">
           <div className="testimonials-header reveal">
             <div className="section-label">
@@ -510,7 +512,7 @@ export default function Landing() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ── CTA ── */}
       <section className="cta-section" id="cta">
@@ -540,7 +542,9 @@ export default function Landing() {
       <footer className="landing-footer">
         <div className="footer-inner">
           <div className="footer-brand">
-            <div className="footer-logo">🧠</div>
+            <div className="footer-logo">
+              <img src="public/logo.png" alt="logo" />
+            </div>
             <span className="footer-name">CEA-AI</span>
           </div>
           <div className="footer-links">
