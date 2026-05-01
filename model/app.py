@@ -17,7 +17,7 @@ print("-"*60)
 
 
 MODEL_ID = "Vaibhavkumawatt/empathetic-blenderbot"  
-GROQ_API_KEY = "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"
+GROQ_API_KEY = ""
 
 print(f"\nLoading model: {MODEL_ID}")
 print(f"Device: {'CUDA' if torch.cuda.is_available() else 'CPU'}")
