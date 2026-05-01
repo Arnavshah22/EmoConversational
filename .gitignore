@@ -39,6 +39,12 @@ frontend/dist/
 backend/node_modules/
 backend/dist/
 
+# Model
+model/__pycache__/
+model/.venv/
+model/models/
+model/.env
+
 # Ignore coverage
 coverage/
 
